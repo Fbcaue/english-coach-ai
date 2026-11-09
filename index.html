@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#173b73">
+<link rel="manifest" href="manifest.webmanifest">
+<title>English Coach AI</title>
+<style>
+:root{--blue:#173b73;--light:#eef4ff;--ink:#17243a;--muted:#65738a;--white:#fff}
+*{box-sizing:border-box}body{margin:0;background:#f5f7fb;color:var(--ink);font:16px system-ui,-apple-system,Segoe UI,sans-serif}
+header{background:var(--blue);color:white;padding:22px 18px 28px;border-radius:0 0 24px 24px}
+header small{opacity:.8}h1{margin:5px 0;font-size:25px}.wrap{max-width:680px;margin:auto;padding:16px}
+.card{background:white;border-radius:18px;padding:18px;margin:12px 0;box-shadow:0 3px 16px #14284a0d}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.pill{background:var(--light);color:var(--blue);padding:6px 10px;border-radius:99px;font-size:13px}
+h2{font-size:19px;margin:0 0 10px}p{line-height:1.5}.muted{color:var(--muted);font-size:14px}
+button{border:0;border-radius:12px;padding:12px 15px;background:var(--blue);color:white;font-weight:650;font-size:15px;cursor:pointer}
+button.secondary{background:var(--light);color:var(--blue)}button:disabled{opacity:.5}
+.word{font-size:27px;font-weight:750;margin:12px 0 3px}.translation{color:var(--muted)}
+#heard{min-height:44px;background:#f5f7fb;border-radius:12px;padding:12px;margin:12px 0}
+nav{display:flex;gap:8px;overflow:auto;margin:12px 0}nav button{white-space:nowrap}
+.progress{height:9px;background:#e7edf7;border-radius:9px;overflow:hidden}.progress span{display:block;width:8%;height:100%;background:#2e9b70}
+footer{text-align:center;color:var(--muted);font-size:12px;padding:20px}
+</style>
+</head>
+<body>
+<header><small>SUA PROFESSORA PARTICULAR</small><h1>English Coach AI 🇺🇸</h1><div>Aprenda inglês para viajar e morar fora.</div></header>
+<main class="wrap">
+  <nav aria-label="Seções">
+    <button class="secondary" onclick="show('home')">Início</button>
+    <button class="secondary" onclick="show('lesson')">Minha aula</button>
+    <button class="secondary" onclick="show('practice')">Praticar fala</button>
+  </nav>
+  <section id="home">
+    <div class="card">
+      <div class="row"><span class="pill">Nível A1 · Iniciante absoluto</span><span class="pill">Aula 1</span></div>
+      <h2 style="margin-top:14px">Vamos começar com o básico!</h2>
+      <p>Hoje você vai aprender a cumprimentar alguém e dizer seu nome em inglês.</p>
+      <div class="progress"><span></span></div><p class="muted">Seu progresso começa na primeira aula.</p>
+      <button onclick="show('lesson')">Começar aula</button>
+    </div>
+    <div class="card"><h2>Seu plano diário</h2><p>30 minutos: vocabulário, escuta, conversação e revisão.</p></div>
+  </section>
+  <section id="lesson" hidden>
+    <div class="card">
+      <span class="pill">Aula 1 · Cumprimentos</span>
+      <div class="word">Hello!</div><div class="translation">Olá!</div>
+      <p>Repita em voz alta. Ouça a pronúncia e depois tente falar.</p>
+      <div class="row"><button onclick="speak('Hello!')">🔊 Ouvir</button><button class="secondary" onclick="show('practice')">🎙️ Repetir</button></div>
+    </div>
+    <div class="card"><div class="word">My name is...</div><div class="translation">Meu nome é...</div><button onclick="speak('My name is...')">🔊 Ouvir</button></div>
+    <div class="card"><div class="word">Nice to meet you.</div><div class="translation">Prazer em conhecer você.</div><button onclick="speak('Nice to meet you.')">🔊 Ouvir</button></div>
+    <div class="card"><h2>Pequeno diálogo</h2><p><b>Teacher:</b> Hello! What is your name?</p><p><b>You:</b> My name is...</p><button onclick="speak('Hello! What is your name?')">Ouvir a pergunta</button></div>
+  </section>
+  <section id="practice" hidden>
+    <div class="card">
+      <h2>Hora de falar 🎙️</h2>
+      <p>Toque no microfone e diga: <b>“Hello, my name is...”</b></p>
+      <button id="mic" onclick="listen()">🎙️ Falar agora</button>
+      <div id="heard">O que você disser aparecerá aqui.</div>
+      <p class="muted" id="feedback">Dica: fale devagar e em um lugar silencioso.</p>
+      <button class="secondary" onclick="speak('Hello! My name is...')">Ouvir exemplo</button>
+    </div>
+  </section>
+</main>
+<footer>Protótipo inicial · A professora com IA e o histórico personalizado serão conectados na próxima etapa.</footer>
+<script>
+function show(id){['home','lesson','practice'].forEach(x=>document.getElementById(x).hidden=x!==id)}
+function speak(text){
+  if(!('speechSynthesis' in window)){alert('Seu navegador não oferece leitura de voz. Tente abrir no Chrome.');return}
+  speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(text);u.lang='en-US';u.rate=.82;
+  const voices=speechSynthesis.getVoices();const female=voices.find(v=>/female|woman|samantha|zira|aria|jenny/i.test(v.name));
+  if(female)u.voice=female;speechSynthesis.speak(u);
+}
+function listen(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){document.getElementById('feedback').textContent='Reconhecimento de voz não disponível neste navegador. Use o Chrome no Android.';return}
+  const r=new SR();r.lang='en-US';r.interimResults=false;r.maxAlternatives=1;
+  const b=document.getElementById('mic');b.disabled=true;b.textContent='Ouvindo...';
+  r.onresult=e=>{const t=e.results[0][0].transcript;document.getElementById('heard').textContent=t;
+    document.getElementById('feedback').textContent='Muito bem! Compare sua fala com o exemplo e tente novamente.'};
+  r.onerror=()=>document.getElementById('feedback').textContent='Não consegui ouvir. Confira a permissão do microfone e tente novamente.';
+  r.onend=()=>{b.disabled=false;b.textContent='🎙️ Falar agora'};r.start();
+}
+if('serviceWorker' in navigator && location.protocol.startsWith('http')){navigator.serviceWorker.register('./sw.js').catch(()=>{});}
+</script>
+</body></html>
